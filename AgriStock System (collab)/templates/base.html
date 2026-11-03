@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}AgriStock{% endblock %} · AgriStock</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static',filename='css/style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+{% if session.get('user_id') %}
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="{{ url_for('dashboard') }}"><span class="brand-mark">A</span><span>Agri<span class="brand-light">Stock</span><small>INVENTORY CONTROL</small></span></a>
+    <div class="nav-caption">WORKSPACE</div>
+    <nav>
+      <a class="nav-link {% if request.endpoint=='dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}"><span>▦</span> Dashboard</a>
+      <a class="nav-link {% if request.endpoint in ['products','product_add','product_edit'] %}active{% endif %}" href="{{ url_for('products') }}"><span>▤</span> Products</a>
+      <a class="nav-link {% if request.endpoint in ['suppliers','supplier_add','supplier_edit'] %}active{% endif %}" href="{{ url_for('suppliers') }}"><span>♧</span> Suppliers</a>
+      <a class="nav-link {% if request.endpoint in ['batches','stock_in','stock_out'] %}active{% endif %}" href="{{ url_for('batches') }}"><span>▣</span> Inventory batches</a>
+      <a class="nav-link" href="{{ url_for('stock_in') }}"><span>＋</span> Stock-in</a>
+      <a class="nav-link" href="{{ url_for('stock_out') }}"><span>↗</span> Stock-out / FEFO</a>
+      <div class="nav-caption">INSIGHTS</div>
+      <a class="nav-link {% if request.endpoint=='reports' %}active{% endif %}" href="{{ url_for('reports') }}"><span>▥</span> Reports & analytics</a>
+      <a class="nav-link {% if request.endpoint=='knowledge' %}active{% endif %}" href="{{ url_for('knowledge') }}"><span>❋</span> Agri knowledge</a>
+      {% if session.get('role')=='Admin' %}
+      <div class="nav-caption">ADMINISTRATION</div>
+      <a class="nav-link {% if request.endpoint in ['users','user_add','user_edit'] %}active{% endif %}" href="{{ url_for('users') }}"><span>♙</span> User management</a>
+      <a class="nav-link {% if request.endpoint=='audit_page' %}active{% endif %}" href="{{ url_for('audit_page') }}"><span>◷</span> Audit trail</a>
+      {% endif %}
+    </nav>
+    <div class="sidebar-bottom"><div class="help-card"><span class="help-icon">✦</span><b>Growing better, together.</b><p>Keep every batch accounted for.</p></div><a class="nav-link" href="{{ url_for('change_password') }}"><span>⚙</span> Account settings</a><a class="nav-link" href="{{ url_for('logout') }}"><span>⇥</span> Sign out</a></div>
+  </aside>
+  <main class="main-area">
+    <header class="topbar"><button class="icon-btn mobile-menu" id="menuToggle">☰</button><div><span class="eyebrow">AGRICULTURAL INVENTORY</span><div class="top-date">{{ today.strftime('%A, %d %B %Y') }}</div></div><div class="top-actions"><button class="icon-btn" id="themeToggle" title="Toggle theme">◐</button><div class="user-chip"><div class="avatar">{{ session.get('full_name','A')[0]|upper }}</div><div><b>{{ session.get('full_name') }}</b><small>{{ session.get('role') }}</small></div></div></div></header>
+    <section class="page-content">
+      {% with messages=get_flashed_messages(with_categories=true) %}{% if messages %}<div class="flash-stack">{% for category,message in messages %}<div class="flash {{ category }}">{{ message }}<button onclick="this.parentElement.remove()">×</button></div>{% endfor %}</div>{% endif %}{% endwith %}
+      {% block content %}{% endblock %}
+    </section>
+    <footer class="footer">AgriStock <span>·</span> Inventory that grows with your business</footer>
+  </main>
+</div>
+{% else %}
+{% with messages=get_flashed_messages(with_categories=true) %}{% if messages %}<div class="auth-flashes">{% for category,message in messages %}<div class="flash {{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}{% endwith %}
+{% block auth_content %}{% endblock %}
+{% endif %}
+<script src="{{ url_for('static',filename='js/app.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body></html>
